@@ -1,34 +1,45 @@
 #!/usr/bin/python3
-"""
-MRUCache module
-"""
+""" MRU Caching """
 
-BaseCaching = __import__("base_caching").BaseCaching
+from base_caching import BaseCaching
 
 
 class MRUCache(BaseCaching):
-    """MRUCache class"""
+    """ MRU caching """
 
     def __init__(self):
+        """ Constructor """
         super().__init__()
-        self._mru_keys = []
+        self.queue = []
 
     def put(self, key, item):
-        """Add an item in the cache"""
-        if key is not None and item is not None:
-            self.cache_data[key] = item
-            if key in self._mru_keys:
-                self._mru_keys.remove(key)
+        """ Puts item in cache """
+        if key is None or item is None:
+            return
 
-            if len(self.cache_data) > self.MAX_ITEMS:
-                removed_key = self._mru_keys.pop()
-                del self.cache_data[removed_key]
-                print(f"DISCARD: {removed_key}")
-            self._mru_keys.append(key)
+        self.cache_data[key] = item
+
+        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
+            if self.queue:
+                last = self.queue.pop()
+                del self.cache_data[last]
+                print("DISCARD: {}".format(last))
+
+        if key not in self.queue:
+            self.queue.append(key)
+        else:
+            self.mv_last_list(key)
 
     def get(self, key):
-        """Get an item by key"""
-        if key in self.cache_data.keys():
-            self._mru_keys.pop(self._mru_keys.index(key))
-            self._mru_keys.append(key)
-        return self.cache_data.get(key, None)
+        """ Gets item from cache """
+        item = self.cache_data.get(key, None)
+        if item is not None:
+            self.mv_last_list(key)
+        return item
+
+    def mv_last_list(self, item):
+        """ Moves element to last idx of list """
+        length = len(self.queue)
+        if self.queue[length - 1] != item:
+            self.queue.remove(item)
+            self.queue.append(item)
