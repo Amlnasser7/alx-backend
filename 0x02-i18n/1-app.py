@@ -1,31 +1,34 @@
 #!/usr/bin/env python3
-"""
-1-app.py
-"""
+'''
+    Basic Babel setup.
+'''
 
-from flask import Flask, render_template
 from flask_babel import Babel
+from flask import Flask, render_template
 
-app = Flask(__name__)
-
-
-class Config(object):
-    """Config class"""
-
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
-
-
-app.config.from_object(Config)
+app = Flask(__name__, template_folder='templates')
 babel = Babel(app)
 
 
-@app.route("/")
-def hello_world() -> str:
-    """Return a simple string as our response"""
-    return render_template("1-index.html")
+class Config(object):
+    '''
+        Babel configuration.
+    '''
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
-if __name__ == "__main__":
+app.config.from_object(Config)
+
+
+@app.route('/', methods=['GET'], strict_slashes=False)
+def helloWorld() -> str:
+    '''
+        Render template for Babel usage.
+    '''
+    return render_template('1-index.html')
+
+
+if __name__ == '__main__':
     app.run()
